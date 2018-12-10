@@ -7,7 +7,6 @@ syntax on
 set number relativenumber
 "filetype plugin indent on
 set nu rnu
-set textwidth=100
 
 "Vimwiki Settings
 let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki/'}]
