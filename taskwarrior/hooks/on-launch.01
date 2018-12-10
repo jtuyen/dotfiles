@@ -1,0 +1,15 @@
+#!/usr/bin/python
+
+import tasklib
+
+tw = tasklib.TaskWarrior(data_location='~/Dropbox/taskwarrior/.task', create=False)
+
+habittasks = tw.tasks.filter(tag_contains="habit", due="yesterday", status="pending")
+
+if len(habittasks) = 0:
+    break
+else:
+    for task in habittasks:
+        task['tags'] = 'habitbroken'
+        task['status'] = 'deleted'
+        task.save()
