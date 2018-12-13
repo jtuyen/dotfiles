@@ -10,10 +10,12 @@ set nu rnu
 set textwidth=100
 
 "Vimwiki Settings
-let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki/'}]
+let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki/', 'syntax': 'markdown', 'ext': '.md'}]
 "syntax on
 filetype plugin on
 set nocompatible
+let g:vimwiki_folding = 'list'
+let g:vimwiki_ext2syntax = {'.md': 'markdown', '.markdown': 'markdown', '.mdown': 'markdown'}
 
 "NERDTree Settings
 "nmap <F6> :NERDTreeToggle<CR>
@@ -23,14 +25,19 @@ set nocompatible
 set rtp+=/usr/local/opt/fzf
 nnoremap <C-p> :<C-u>FZF<CR>
 
-"ALE Settings"
+"ALE Settings
 "let g:ale_linters = {'python':['pylint']}
 nmap <silent> [W <Plug>(ale_first)
 nmap <silent> [w <Plug>(ale_previous)
 nmap <silent> ]w <Plug>(ale_next)
 nmap <silent> ]W <Plug>(ale_last)
 
+"Instant Markdown Settings
+let g:instant_markdown_autostart = 0
+map <leader>md :InstantMarkdownPreview<CR>
+
 "Key Bindings
 iab <expr> xdate strftime("%a, %d %b %Y %H:%M:%S %z")
 :nnoremap <F5> "=strftime("%c")<CR>P
 :inoremap <F5> <C-R>=strftime("%c")<CR>
+:nnoremap <space> i<space><esc>
