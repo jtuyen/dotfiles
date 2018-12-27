@@ -7,14 +7,14 @@ syntax on
 set number relativenumber
 "filetype plugin indent on
 set nu rnu
-set textwidth=100
+set textwidth=150
 
 "Vimwiki Settings
 let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki/', 'syntax': 'markdown', 'ext': '.md'}]
 "syntax on
 filetype plugin on
 set nocompatible
-let g:vimwiki_folding = 'list'
+let g:vimwiki_folding = 'manual'
 let g:vimwiki_ext2syntax = {'.md': 'markdown', '.markdown': 'markdown', '.mdown': 'markdown'}
 
 "NERDTree Settings
@@ -35,6 +35,7 @@ nmap <silent> ]W <Plug>(ale_last)
 "Instant Markdown Settings
 let g:instant_markdown_autostart = 0
 map <leader>md :InstantMarkdownPreview<CR>
+let g:instant_markdown_slow = 1
 
 "Key Bindings
 iab <expr> xdate strftime("%a, %d %b %Y %H:%M:%S %z")
