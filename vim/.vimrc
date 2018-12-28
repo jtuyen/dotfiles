@@ -42,3 +42,4 @@ iab <expr> xdate strftime("%a, %d %b %Y %H:%M:%S %z")
 :nnoremap <F5> "=strftime("%c")<CR>P
 :inoremap <F5> <C-R>=strftime("%c")<CR>
 :nnoremap <space> i<space><esc>
+:nmap <CR><CR> o<ESC>
