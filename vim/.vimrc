@@ -33,15 +33,12 @@ nmap <silent> ]w <Plug>(ale_next)
 nmap <silent> ]W <Plug>(ale_last)
 
 "Instant Markdown Settings
-"let g:instant_markdown_autostart = 0
-"map <leader>md :InstantMarkdownPreview<CR>
-"let g:instant_markdown_slow = 1
+let g:instant_markdown_autostart = 0
+map <leader>md :InstantMarkdownPreview<CR>
+let g:instant_markdown_slow = 1
 
-"Livedown.vim
-let g:livedown_autorun = 0
-let g:livedown_port = 8090
-let g:livedown_browser = "google chrome"
-map <leader>md :LivedownToggle<CR>
+"vim-buftabline
+set hidden
 
 "Key Bindings
 iab <expr> xdate strftime("%a, %d %b %Y %H:%M:%S %z")
@@ -53,3 +50,4 @@ iab <expr> xdate strftime("%a, %d %b %Y %H:%M:%S %z")
 :nnoremap <C-j> :bprev<CR>
 :nnoremap <C-k> :bnext<CR>
 :nnoremap <C-w> :w<ESC>:bd<CR>
+:nnoremap <C-q> :bd<CR>
