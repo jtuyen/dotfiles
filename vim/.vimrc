@@ -8,22 +8,24 @@ set number relativenumber
 "filetype plugin indent on
 set nu rnu
 set textwidth=150
+set scrolloff=50
 
 "Vimwiki Settings
 let g:vimwiki_list = [{'path': '~/Dropbox/vimwiki/', 'syntax': 'markdown', 'ext': '.md'}]
 "syntax on
 filetype plugin on
 set nocompatible
-let g:vimwiki_folding = 'manual'
+let g:vimwiki_folding = 'expr'
 let g:vimwiki_ext2syntax = {'.md': 'markdown', '.markdown': 'markdown', '.mdown': 'markdown'}
-
-"NERDTree Settings
-"nmap <F6> :NERDTreeToggle<CR>
-"let NERDTreeShowHidden=1
 
 "FZF Settings
 set rtp+=/usr/local/opt/fzf
 nnoremap <C-p> :<C-u>FZF<CR>
+
+"vim-grip
+let g:grip_default_map = 0
+:nnoremap <leader>md :GripStart<CR>
+:nnoremap <leader>mx :GripClean!<CR>
 
 "ALE Settings
 "let g:ale_linters = {'python':['pylint']}
@@ -32,22 +34,17 @@ nmap <silent> [w <Plug>(ale_previous)
 nmap <silent> ]w <Plug>(ale_next)
 nmap <silent> ]W <Plug>(ale_last)
 
-"Instant Markdown Settings
-let g:instant_markdown_autostart = 0
-map <leader>md :InstantMarkdownPreview<CR>
-let g:instant_markdown_slow = 1
-
 "vim-buftabline
 set hidden
 
 "Key Bindings
 iab <expr> xdate strftime("%a, %d %b %Y %H:%M:%S %z")
 :nnoremap <F5> "=strftime("%c")<CR>P
-:inoremap <F5> <C-R>=strftime("%c")<CR>
-:nnoremap <space> i<space><esc>
+:inoremap <F5> <CR>=strftime("%c")<CR>
+:nnoremap <SPACE> i<SPACE><ESC>
 :nmap <CR><CR> o<ESC>
 :nmap <CR><CR> O<ESC>
 :nnoremap <C-j> :bprev<CR>
 :nnoremap <C-k> :bnext<CR>
-:nnoremap <C-w> :w<ESC>:bd<CR>
-:nnoremap <C-q> :bd<CR>
+:nnoremap <C-w> :w<CR>:bd<CR>
+:nnoremap <C-e> :bd<CR>
