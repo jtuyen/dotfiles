@@ -1,9 +1,9 @@
 hs.loadSpoon("ShiftIt")
 spoon.ShiftIt:bindHotkeys({
-    left = {{ 'shift', 'ctrl', 'alt', 'cmd' }, 'left' },
-    right = {{ 'shift', 'ctrl', 'alt', 'cmd' }, 'right' },
-    up = {{ 'shift', 'ctrl', 'alt', 'cmd' }, 'up' },
-    down = {{ 'shift', 'ctrl', 'alt', 'cmd' }, 'down' },
+    left = {{ 'shift', 'ctrl', 'alt', 'cmd' }, 'h' },
+    right = {{ 'shift', 'ctrl', 'alt', 'cmd' }, 'l' },
+    up = {{ 'shift', 'ctrl', 'alt', 'cmd' }, 'k' },
+    down = {{ 'shift', 'ctrl', 'alt', 'cmd' }, 'j' },
     upleft = {{ 'shift', 'ctrl', 'alt', 'cmd' }, '1' },
     upright = {{ 'shift', 'ctrl', 'alt', 'cmd' }, '2' },
     botleft = {{ 'shift', 'ctrl', 'alt', 'cmd' }, '3' },
