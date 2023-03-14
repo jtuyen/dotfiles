@@ -1,4 +1,5 @@
 hs.loadSpoon("ShiftIt")
+hs.loadSpoon("fnMate")
 spoon.ShiftIt:bindHotkeys({
     left = {{ 'shift', 'ctrl', 'alt', 'cmd' }, 'h' },
     right = {{ 'shift', 'ctrl', 'alt', 'cmd' }, 'l' },
