@@ -1,3 +1,5 @@
+### Hammerspoon has been replaced by BetterTouchTool
+
 hs.loadSpoon("ShiftIt")
 hs.loadSpoon("fnMate")
 spoon.ShiftIt:bindHotkeys({
