@@ -32,4 +32,3 @@ nmap <Leader>w <C-w>z<CR>
 nmap <Leader>r :History:<CR>
 
 call plug#end()
-
