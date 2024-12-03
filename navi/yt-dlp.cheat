@@ -1,0 +1,2 @@
+# Download video as mp4 video and m4a audio and merge into one
+yt-dlp -S res,ext:mp4:m4a <URL>
