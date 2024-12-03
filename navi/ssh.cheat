@@ -1,0 +1,1 @@
+ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c ssh-rsa,ssh-dss <REMOTE_HOST>
