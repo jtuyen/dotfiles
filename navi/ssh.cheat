@@ -1,2 +1,4 @@
+% ssh
+
 # Very rarely used command to connect to crap services
 ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c ssh-rsa,ssh-dss <REMOTE_HOST>

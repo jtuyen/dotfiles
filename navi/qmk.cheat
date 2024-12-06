@@ -1,0 +1,10 @@
+% qmk
+
+# keyball61 - compile qmk firmware
+qmk compile -kb keyball/keyball61 -km default
+
+# kyria - compile and flash qmk firmware
+qmk flash -kb splitkb/kyria/rev2 -e CONVERT_TO=promicro_rp2040
+
+# kyria - export keymap to json
+qmk c2json -km keymap.c -kb splitkb/kyria/rev2 -o export.json keymap.c
