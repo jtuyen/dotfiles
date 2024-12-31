@@ -6,3 +6,8 @@ macos-auto-secure-input = true
 macos-secure-input-indication = true
 macos-titlebar-style = hidden
 macos-option-as-alt = true
+window-decoration = false
+background-opacity = 0.9
+mouse-hide-while-typing
+macos-non-native-fullscreen = true
+copy-on-select = true
