@@ -70,7 +70,7 @@ zstyle ':omz:update' mode auto      # update automatically without asking
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git fzf-tab)
+plugins=(git fzf-tab vi-mode)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -103,6 +103,16 @@ alias ls="lsd"
 alias la='ls -a'
 alias lla='ls -la'
 alias lt='ls --tree'
+alias get_idf='. $HOME/Documents/esp-idf/export.sh'
+
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		builtin cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
 
 HISTSIZE=10000000
 SAVEHIST=10000000
@@ -115,7 +125,11 @@ setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_FIND_NO_DUPS
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export PATH="$HOME/.pyenv/bin:$HOME/.nimble/bin:$PATH"
-eval "$(rbenv init - zsh)"
+export GOENV_ROOT="$HOME/.goenv"
+eval "$(rbenv init -)"
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
+eval "$(goenv init -)"
+eval "$(uv generate-shell-completion zsh)"
+eval "$(zoxide init --cmd cd zsh)"
+export PATH="$HOME/.pyenv/bin:$HOME/.nimble/bin:$GOPATH/bin:$GOENV_ROOT/bin:$HOME/.rbenv/bin:$PATH"
