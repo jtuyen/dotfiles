@@ -9,6 +9,7 @@ ARG FZF_VERSION=0.67.0
 ARG LAZYGIT_VERSION=v0.56.0
 
 ENV HOME=/home/kasm-default-profile
+ENV DISABLE_AUTOUPDATER=1
 WORKDIR $HOME
 
 RUN apt-get update \
@@ -17,13 +18,25 @@ RUN apt-get update \
        ca-certificates \
        curl \
        git \
+       gnupg \
        gzip \
        ripgrep \
        tar \
        unzip \
+       xz-utils \
        zsh \
        zsh-autosuggestions \
        zsh-syntax-highlighting \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs \
+    && npm install -g @openai/codex @anthropic-ai/claude-code \
+    && node --version \
+    && npm --version \
+    && codex --version \
+    && claude --version \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fLO "https://github.com/sharkdp/fd/releases/download/${FD_VERSION}/fd-musl_${FD_VERSION#v}_amd64.deb" \
@@ -91,9 +104,10 @@ RUN export RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
     && git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git "$HOME/.oh-my-zsh/custom/plugins/fast-syntax-highlighting" \
     && git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git "$HOME/.oh-my-zsh/custom/plugins/zsh-autocomplete" \
     && sed -i 's|^export ZSH=.*|export ZSH="$HOME/.oh-my-zsh"|' "$HOME/.zshrc" \
-    && sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete)/' "$HOME/.zshrc" \
+    && sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete fzf vi-mode tmux)/' "$HOME/.zshrc" \
     && sed -i '/^source \$ZSH\/oh-my-zsh.sh/i export ZSH_DISABLE_COMPFIX=true' "$HOME/.zshrc" \
-    && sed -i '/^source \$ZSH\/oh-my-zsh.sh/i if [ -d "$HOME\/.oh-my-zsh" ]; then find "$HOME\/.oh-my-zsh" -type d -exec chmod 755 {} + 2>\/dev\/null || true; find "$HOME\/.oh-my-zsh" -type f -exec chmod 644 {} + 2>\/dev\/null || true; chmod 755 "$HOME" 2>\/dev\/null || true; fi' "$HOME/.zshrc"
+    && sed -i '/^source \$ZSH\/oh-my-zsh.sh/i if [ -d "$HOME\/.oh-my-zsh" ]; then find "$HOME\/.oh-my-zsh" -type d -exec chmod 755 {} + 2>\/dev\/null || true; find "$HOME\/.oh-my-zsh" -type f -exec chmod 644 {} + 2>\/dev\/null || true; chmod 755 "$HOME" 2>\/dev\/null || true; fi' "$HOME/.zshrc" \
+    && printf '\nif [[ -z "${CODEX_AUTH_CHECK_PRINTED:-}" ]]; then\n  export CODEX_AUTH_CHECK_PRINTED=1\n  if [[ -f "$HOME/.codex/auth.json" ]]; then\n    echo "[codex] auth.json present: $HOME/.codex/auth.json"\n  else\n    echo "[codex] auth.json missing: $HOME/.codex/auth.json"\n  fi\nfi\nif [[ -z "${CLAUDE_AUTH_CHECK_PRINTED:-}" ]]; then\n  export CLAUDE_AUTH_CHECK_PRINTED=1\n  if [[ -n "${ANTHROPIC_API_KEY:-}" ]]; then\n    echo "[claude] ANTHROPIC_API_KEY is set"\n  else\n    echo "[claude] ANTHROPIC_API_KEY is not set"\n  fi\n  if [[ -f "$HOME/.claude/settings.json" ]]; then\n    echo "[claude] settings present: $HOME/.claude/settings.json"\n  else\n    echo "[claude] settings missing: $HOME/.claude/settings.json"\n  fi\nfi\n' >> "$HOME/.zshrc"
 
 RUN printf '\ncase "$-" in\n  *i*) exec /usr/bin/zsh -l;;\nesac\n' >> "$HOME/.bashrc"
 
@@ -121,6 +135,8 @@ RUN HOME=$HOME \
     && fdfind --version \
     && fzf --version \
     && lazygit --version \
+    && codex --version \
+    && claude --version \
     && nvim --version | head -n 1
 
 RUN chown -R 1000:1000 \
@@ -150,3 +166,4 @@ RUN mkdir -p $HOME \
     && chown -R 1000:0 $HOME
 
 USER 1000
+
