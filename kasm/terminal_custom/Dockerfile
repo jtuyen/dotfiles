@@ -17,27 +17,35 @@ RUN apt-get update \
        build-essential \
        ca-certificates \
        curl \
+       fuse3 \
        git \
        gnupg \
        gzip \
+       openssh-client \
        ripgrep \
+       sshfs \
        tar \
        unzip \
        xz-utils \
        zsh \
-       zsh-autosuggestions \
        zsh-syntax-highlighting \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs \
-    && npm install -g @openai/codex @anthropic-ai/claude-code \
+    && npm install -g @openai/codex @anthropic-ai/claude-code @mariozechner/pi-coding-agent \
     && node --version \
     && npm --version \
     && codex --version \
     && claude --version \
+    && command -v pi \
+    && pi --help >/dev/null \
     && rm -rf /var/lib/apt/lists/*
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_UNMANAGED_INSTALL="/usr/local/bin" sh \
+    && uv --version \
+    && uvx --version
 
 RUN curl -fLO "https://github.com/sharkdp/fd/releases/download/${FD_VERSION}/fd-musl_${FD_VERSION#v}_amd64.deb" \
     && apt-get update \
@@ -74,6 +82,14 @@ RUN curl -fLO "https://github.com/jesseduffield/lazygit/releases/download/${LAZY
     && rm -f lazygit "lazygit_${LAZYGIT_VERSION#v}_Linux_x86_64.tar.gz" \
     && lazygit --version | grep -q "version=${LAZYGIT_VERSION#v}"
 
+RUN mkdir -p $HOME/.ssh $HOME/persist
+
+COPY id_rsa_blank id_rsa_blank.pub $HOME/.ssh/
+
+RUN chmod 700 $HOME/.ssh \
+    && chmod 600 $HOME/.ssh/id_rsa_blank \
+    && chmod 644 $HOME/.ssh/id_rsa_blank.pub
+
 COPY .tmux.conf $HOME/.tmux.conf
 
 RUN grep -q "tmux-plugins/tpm" $HOME/.tmux.conf \
@@ -99,15 +115,14 @@ RUN export RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
        ZSH_CUSTOM="$HOME/.oh-my-zsh/custom" \
        sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended \
     && mkdir -p "$HOME/.oh-my-zsh/custom/plugins" \
-    && git clone https://github.com/zsh-users/zsh-autosuggestions.git "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions" \
     && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" \
-    && git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git "$HOME/.oh-my-zsh/custom/plugins/fast-syntax-highlighting" \
     && git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git "$HOME/.oh-my-zsh/custom/plugins/zsh-autocomplete" \
+    && git clone https://github.com/zdharma-continuum/fast-syntax-highlighting.git "$HOME/.oh-my-zsh/custom/plugins/fast-syntax-highlighting" \
     && sed -i 's|^export ZSH=.*|export ZSH="$HOME/.oh-my-zsh"|' "$HOME/.zshrc" \
-    && sed -i 's/^plugins=.*/plugins=(git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete fzf vi-mode tmux)/' "$HOME/.zshrc" \
+    && sed -i 's/^plugins=.*/plugins=(git zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete fzf vi-mode tmux)/' "$HOME/.zshrc" \
     && sed -i '/^source \$ZSH\/oh-my-zsh.sh/i export ZSH_DISABLE_COMPFIX=true' "$HOME/.zshrc" \
     && sed -i '/^source \$ZSH\/oh-my-zsh.sh/i if [ -d "$HOME\/.oh-my-zsh" ]; then find "$HOME\/.oh-my-zsh" -type d -exec chmod 755 {} + 2>\/dev\/null || true; find "$HOME\/.oh-my-zsh" -type f -exec chmod 644 {} + 2>\/dev\/null || true; chmod 755 "$HOME" 2>\/dev\/null || true; fi' "$HOME/.zshrc" \
-    && printf '\nif [[ -z "${CODEX_AUTH_CHECK_PRINTED:-}" ]]; then\n  export CODEX_AUTH_CHECK_PRINTED=1\n  if [[ -f "$HOME/.codex/auth.json" ]]; then\n    echo "[codex] auth.json present: $HOME/.codex/auth.json"\n  else\n    echo "[codex] auth.json missing: $HOME/.codex/auth.json"\n  fi\nfi\nif [[ -z "${CLAUDE_AUTH_CHECK_PRINTED:-}" ]]; then\n  export CLAUDE_AUTH_CHECK_PRINTED=1\n  if [[ -n "${ANTHROPIC_API_KEY:-}" ]]; then\n    echo "[claude] ANTHROPIC_API_KEY is set"\n  else\n    echo "[claude] ANTHROPIC_API_KEY is not set"\n  fi\n  if [[ -f "$HOME/.claude/settings.json" ]]; then\n    echo "[claude] settings present: $HOME/.claude/settings.json"\n  else\n    echo "[claude] settings missing: $HOME/.claude/settings.json"\n  fi\nfi\n' >> "$HOME/.zshrc"
+    && printf '\nif [[ -z "${CODEX_AUTH_CHECK_PRINTED:-}" ]]; then\n  export CODEX_AUTH_CHECK_PRINTED=1\n  if [[ -f "$HOME/.codex/auth.json" ]]; then\n    echo "[codex] auth.json present: $HOME/.codex/auth.json"\n  else\n    echo "[codex] auth.json missing: $HOME/.codex/auth.json"\n  fi\nfi\nif [[ -z "${CLAUDE_AUTH_CHECK_PRINTED:-}" ]]; then\n  export CLAUDE_AUTH_CHECK_PRINTED=1\n  if [[ -n "${ANTHROPIC_API_KEY:-}" ]]; then\n    echo "[claude] ANTHROPIC_API_KEY is set"\n  else\n    echo "[claude] ANTHROPIC_API_KEY is not set"\n  fi\n  if [[ -f "$HOME/.claude/settings.json" ]]; then\n    echo "[claude] settings present: $HOME/.claude/settings.json"\n  else\n    echo "[claude] settings missing: $HOME/.claude/settings.json"\n  fi\nfi\nif [[ -z "${USERNS_CHECK_PRINTED:-}" ]]; then\n  export USERNS_CHECK_PRINTED=1\n  if [[ -r /proc/sys/kernel/unprivileged_userns_clone ]]; then\n    userns_value="$(cat /proc/sys/kernel/unprivileged_userns_clone 2>/dev/null || echo unknown)"\n    if [[ "$userns_value" == "1" ]]; then\n      echo "[userns] kernel.unprivileged_userns_clone=1"\n    else\n      echo "[userns] kernel.unprivileged_userns_clone=$userns_value"\n      echo "[userns] host fix required: sudo sysctl -w kernel.unprivileged_userns_clone=1"\n    fi\n  else\n    echo "[userns] unable to read /proc/sys/kernel/unprivileged_userns_clone"\n  fi\nfi\n' >> "$HOME/.zshrc"
 
 RUN printf '\ncase "$-" in\n  *i*) exec /usr/bin/zsh -l;;\nesac\n' >> "$HOME/.bashrc"
 
@@ -137,6 +152,8 @@ RUN HOME=$HOME \
     && lazygit --version \
     && codex --version \
     && claude --version \
+    && uv --version \
+    && command -v pi \
     && nvim --version | head -n 1
 
 RUN chown -R 1000:1000 \
@@ -144,25 +161,35 @@ RUN chown -R 1000:1000 \
        $HOME/.cache \
        $HOME/.config \
        $HOME/.oh-my-zsh \
+       $HOME/.ssh \
        $HOME/.tmux \
        $HOME/.zshrc \
        $HOME/.bashrc \
        $HOME/.tmux.conf \
+       $HOME/persist \
     && find $HOME/.oh-my-zsh -type d -exec chmod 755 {} \; \
     && find $HOME/.oh-my-zsh -type f -exec chmod 644 {} \; \
     && find $HOME/.tmux -type d -exec chmod 755 {} \; \
     && chmod -R u=rwX,go=rX $HOME/.tmux \
+    && chmod 700 $HOME/.ssh \
+    && chmod 600 $HOME/.ssh/id_rsa_blank \
+    && chmod 644 $HOME/.ssh/id_rsa_blank.pub \
     && chmod 644 $HOME/.tmux.conf $HOME/.zshrc $HOME/.bashrc $HOME/.config/xfce4/terminal/terminalrc \
     && chmod 755 $HOME/.tmux/plugins/tpm/tpm \
     && chmod 755 $HOME/.tmux/plugins/tpm/bin/* \
-    && chmod 755 $HOME $HOME/.config $HOME/.config/xfce4 $HOME/.config/xfce4/terminal $HOME/.local $HOME/.local/share $HOME/.local/share/fonts $HOME/.cache \
+    && chmod 755 $HOME $HOME/.config $HOME/.config/xfce4 $HOME/.config/xfce4/terminal $HOME/.local $HOME/.local/share $HOME/.local/share/fonts $HOME/.cache $HOME/persist \
     && chown 1000:0 $HOME \
     && /dockerstartup/set_user_permission.sh $HOME
 
 ENV HOME=/home/kasm-user
 WORKDIR $HOME
 
-RUN mkdir -p $HOME \
+RUN mkdir -p $HOME/.ssh $HOME/persist \
+    && cp /home/kasm-default-profile/.ssh/id_rsa_blank $HOME/.ssh/id_rsa_blank \
+    && cp /home/kasm-default-profile/.ssh/id_rsa_blank.pub $HOME/.ssh/id_rsa_blank.pub \
+    && chmod 700 $HOME/.ssh \
+    && chmod 600 $HOME/.ssh/id_rsa_blank \
+    && chmod 644 $HOME/.ssh/id_rsa_blank.pub \
     && chown -R 1000:0 $HOME
 
 USER 1000
