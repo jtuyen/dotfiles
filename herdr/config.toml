@@ -1,0 +1,13 @@
+onboarding = false
+
+[ui]
+show_agent_labels_on_pane_borders = false
+
+[theme]
+name = "gruvbox"
+auto_switch = false
+
+[keys]
+next_workspace = ["prefix+shift+k","prefix+up"]
+previous_workspace = ["prefix+shift+j","prefix+down"]
+detach = ["prefix+d"]
